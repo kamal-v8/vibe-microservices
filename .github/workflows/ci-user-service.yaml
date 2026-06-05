@@ -5,18 +5,18 @@ on:
     branches: [main]
     paths:
       - "services/user-service/**"
-      - .github/workflows/ci-user-service"
+      - ".github/workflows/ci-user-service.yaml"
   pull_request:
     branches: [main]
     paths:
-      - "service/user-service/**"
-      - ".github/workflows/ci-user-service"
+      - "services/user-service/**"
+      - ".github/workflows/ci-user-service.yaml"
   workflow_dispatch:
 
 jobs:
   lint-and-test:
     name: lint-&-test-go
-    runs-on: ububtu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       - name: SetupGO
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version: "1.25"
           cache-dependency-path: services/user-service/go.sum
 
       - name: Verfiy Formatting
