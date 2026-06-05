@@ -1,0 +1,16 @@
+# Exclude git metadata
+.git
+.gitignore
+
+# Exclude local build binaries and temporary files
+user-service
+tmp/
+dist/
+
+# Exclude IDE folders
+.idea/
+.vscode/
+
+# Exclude Docker files
+Dockerfile
+.dockerignore

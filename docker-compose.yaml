@@ -1,0 +1,106 @@
+version: "3.8"
+services:
+  # ─── Data Stores ───────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: pulse-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulse_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pulse-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: pulse-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pulse-network
+
+  # ─── Application Services ─────────────────────────────────
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: pulse-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: "8081"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse_secret}@postgres:5432/${POSTGRES_DB:-pulse}?sslmode=disable"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pulse-network
+
+  post-service:
+    build:
+      context: ./services/post-service
+      dockerfile: Dockerfile
+    container_name: pulse-post-service
+    ports:
+      - "8082:8082"
+    environment:
+      PORT: "8082"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse_secret}@postgres:5432/${POSTGRES_DB:-pulse}"
+      REDIS_URL: "redis://redis:6379/0"
+      USER_SERVICE_URL: "http://user-service:8081"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - pulse-network
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: pulse-notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      PORT: "8083"
+      REDIS_URL: "redis://redis:6379/0"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pulse-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  pulse-network:
+    driver: bridge
