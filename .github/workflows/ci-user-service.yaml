@@ -41,7 +41,7 @@ jobs:
           go vet ./...
 
       - name: Go test
-        uses: |
+        run: |
           cd services/user-service/
           go test -v ./...
 
