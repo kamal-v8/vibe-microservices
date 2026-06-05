@@ -1,0 +1,99 @@
+name: Notification Service CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/notification-service/**"
+      - ".github/workflows/ci-notification-service.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "services/notification-service/**"
+      - ".github/workflows/ci-notification-service.yaml"
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    name: Lint & Test Node.js Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: services/notification-service/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd services/notification-service
+          npm ci
+
+      - name: Syntax Check
+        run: |
+          cd services/notification-service
+          node --check src/index.js
+          node --check src/config.js
+          node --check src/logger.js
+          node --check src/subscriber.js
+          node --check src/routes/notifications.js
+
+  build-and-scan:
+    name: Build & Scan Container
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image Locally
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/notification-service
+          file: ./services/notification-service/Dockerfile
+          load: true
+          tags: |
+            ghcr.io/${{ github.repository }}/notification-service:latest
+            ghcr.io/${{ github.repository }}/notification-service:${{ github.sha }}
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "ghcr.io/${{ github.repository }}/notification-service:latest"
+          format: "table"
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+
+      - name: Push Docker Image to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker push ghcr.io/${{ github.repository }}/notification-service:latest
+          docker push ghcr.io/${{ github.repository }}/notification-service:${{ github.sha }}
