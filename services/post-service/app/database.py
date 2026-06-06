@@ -64,7 +64,9 @@ class Database:
                 if attempt < retries:
                     time.sleep(backoff)
                 else:
-                    logger.error("All %d database connection attempts exhausted", retries)
+                    logger.error(
+                        "All %d database connection attempts exhausted", retries
+                    )
                     raise
 
     def disconnect(self) -> None:

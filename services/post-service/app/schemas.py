@@ -11,10 +11,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
 # ------------------------------------------------------------------
 # Request models
 # ------------------------------------------------------------------
+
 
 class CreatePostRequest(BaseModel):
     """Payload for creating a new post."""
@@ -30,6 +30,7 @@ class CreatePostRequest(BaseModel):
 # ------------------------------------------------------------------
 # Response models
 # ------------------------------------------------------------------
+
 
 class PostResponse(BaseModel):
     """Serialized representation of a single post."""

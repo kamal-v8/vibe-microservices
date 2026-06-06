@@ -29,7 +29,6 @@ from app.schemas import APIResponse, HealthResponse
 from app.services.event_publisher import EventPublisher
 from app.services.user_client import UserServiceClient
 
-
 # ------------------------------------------------------------------
 # Structured JSON logging
 # ------------------------------------------------------------------
@@ -46,8 +45,17 @@ class JSONFormatter(logging.Formatter):
             "service": "post-service",
         }
         # Merge any extra keys added via `extra={...}`
-        for key in ("user_id", "post_id", "status_code", "method", "path",
-                     "duration_ms", "attempt", "base_url", "channel"):
+        for key in (
+            "user_id",
+            "post_id",
+            "status_code",
+            "method",
+            "path",
+            "duration_ms",
+            "attempt",
+            "base_url",
+            "channel",
+        ):
             value = getattr(record, key, None)
             if value is not None:
                 log_entry[key] = value
@@ -201,7 +209,9 @@ async def metrics():
 
 def _handle_signal(sig, _frame):
     """Log the received signal and let uvicorn handle shutdown."""
-    logger.info("Received signal %s — initiating graceful shutdown", signal.Signals(sig).name)
+    logger.info(
+        "Received signal %s — initiating graceful shutdown", signal.Signals(sig).name
+    )
     sys.exit(0)
 
 

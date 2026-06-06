@@ -61,9 +61,13 @@ async def create_post(body: CreatePostRequest, request: Request):
     # 1. Validate user via User Service
     user_exists = await _user_client(request).validate_user(user_id)
     if not user_exists:
-        logger.info("Post creation rejected — user not found", extra={"user_id": user_id})
+        logger.info(
+            "Post creation rejected — user not found", extra={"user_id": user_id}
+        )
         return Response(
-            content=APIResponse(data=None, error=f"User {user_id} not found").model_dump_json(),
+            content=APIResponse(
+                data=None, error=f"User {user_id} not found"
+            ).model_dump_json(),
             status_code=status.HTTP_400_BAD_REQUEST,
             media_type="application/json",
         )
