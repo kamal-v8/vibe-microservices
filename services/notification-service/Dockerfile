@@ -34,14 +34,20 @@ RUN npm ci --only=production
 
 COPY . .
 
-FROM gcr.io/distroless/nodejs20-debian12
+FROM node:20-slim
 
 WORKDIR /app
 
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 COPY --from=builder /app /app
 
-USER nonroot:nonroot
+RUN chown -R node:node /app
+USER node
 
 EXPOSE 8083
 
-CMD [ "src/index.js" ]
+CMD ["node", "src/index.js"]

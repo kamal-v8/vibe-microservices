@@ -31,12 +31,12 @@ jobs:
 
       - name: Install-Dependencies
         run: |
-          cd /services/notification-service/
+          cd ./services/notification-service/
           npm ci
 
       - name: Syntax-Check
         run: |
-          cd services/notification-service/
+          cd ./services/notification-service/
           node --check src/index.js
           node --check src/config.js
           node --check src/logger.js
