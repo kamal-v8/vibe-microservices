@@ -30,26 +30,26 @@ FROM python:3.11-slim AS builder
 WORKDIR /app
 
 RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt 
+RUN pip install --no-cache-dir --target=/opt/dependencies  -r requirements.txt 
 
 COPY . . 
 
-FROM gcr.io/distroless/python3-debian12 
+FROM python:3.11-slim
 
 WORKDIR /app
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  rm -rf /var/lib/apt/lists/* && \
+  pip uninstall -y pip setuptools wheel
 
-COPY --from=builder /opt/venv /opt/venv
-# COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/lib/python3/dist-packages
+COPY --from=builder /opt/dependencies /opt/dependencies
 COPY . .
-
-USER nonroot:nonroot
-
+ENV PYTHONPATH=/opt/dependencies
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
 EXPOSE 8082
 
-CMD ["-m","app.main"]
-
-
+CMD ["python","-m","app.main"]
