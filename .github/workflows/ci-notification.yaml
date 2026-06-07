@@ -85,7 +85,7 @@ jobs:
       - name: Trivy scan Image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/{{ github.repositroy }}/notification-service:latest
+          image-ref: ghcr.io/{{ github.repository }}/notification-service:latest
           format: "table"
           exit-code: 1
           vuln-type: "os,library"
@@ -95,5 +95,5 @@ jobs:
       - name: Push Docker Image to GHCR
         if: github.event_name == 'push && github.ref' == 'refs/heads/main'
         run: |
-          docker push ghcr.io/${{ github.repositroy }}/notification-service:latest
-          docker push ghcr.io/${{ github.repositroy }}/notification-service:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository }}/notification-service:latest
+          docker push ghcr.io/${{ github.repository }}/notification-service:${{ github.sha }}
