@@ -42,7 +42,7 @@ FROM gcr.io/distroless/python3-debian12
 
 WORKDIR /app
 
-COPY --from=builder /opt/vevn /opt/venv
+COPY --from=builder /opt/venv /opt/venv
 # COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/lib/python3/dist-packages
 COPY . .
 
