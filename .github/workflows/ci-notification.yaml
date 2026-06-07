@@ -88,7 +88,7 @@ jobs:
           image-ref: ghcr.io/{{ github.repositroy }}/notification-service:latest
           format: "table"
           exit-code: 1
-          vuln_type: "os,library"
+          vuln-type: "os,library"
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
 
