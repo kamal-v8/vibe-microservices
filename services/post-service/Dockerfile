@@ -29,6 +29,9 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt 
@@ -39,9 +42,8 @@ FROM gcr.io/distroless/python3-debian12
 
 WORKDIR /app
 
-# COPY --from=builder /app /app
-
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/lib/python3/dist-packages
+COPY --from=builder /opt/vevn /opt/venv
+# COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/lib/python3/dist-packages
 COPY . .
 
 USER nonroot:nonroot

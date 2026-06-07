@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - ".githuh/workflows/ci-post-service.yaml"
+      - ".github/workflows/ci-post-service.yaml"
       - "services/post-service/**"
   workflow_dispatch:
 
@@ -82,7 +82,7 @@ jobs:
           load: true
           tags: |
             ghcr.io/${{ github.repository }}/post-service:latest
-            ghcr.io/${{ github.repository }}/user-service:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/post-service:${{ github.sha }}
 
       - name: Git leaks
         uses: zricethezav/gitleaks-action@v2
@@ -96,7 +96,7 @@ jobs:
           format: table
           exit-code: 1
           ignore-unfixed: true
-          vlun-type: "os,library"
+          vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
 
       - name: Push to GHCR
