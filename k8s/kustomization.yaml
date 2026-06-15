@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - shared/secrets.yaml
+  - shared/configmap.yaml
+  - postgres/configmap.yaml
+  - postgres/deployment.yaml
+  - postgres/service.yaml
+  - postgres/pvc.yaml
+  - redis/deployment.yaml
+  - redis/service.yaml
+  - redis/pvc.yaml
+  - user-service/deployment.yaml
+  - user-service/service.yaml
+  - post-service/deployment.yaml
+  - post-service/service.yaml
+  - notification-service/deployment.yaml
+  - notification-service/service.yaml
+  - shared/gateway.yaml
+  - shared/httproute.yaml

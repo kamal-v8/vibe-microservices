@@ -1,0 +1,218 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pulse-init-db
+data:
+  01-init.sql: |
+    CREATE TABLE IF NOT EXISTS users (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        username    VARCHAR(50) UNIQUE NOT NULL,
+        email       VARCHAR(255) UNIQUE NOT NULL,
+        bio         TEXT DEFAULT '',
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS posts (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content     TEXT NOT NULL CHECK (char_length(content) <= 500),
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+    CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels: { app: postgres }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: postgres }
+  template:
+    metadata:
+      labels: { app: postgres }
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        env:
+        - name: POSTGRES_USER
+          value: "pulse"
+        - name: POSTGRES_PASSWORD
+          value: "pulse_secret"
+        - name: POSTGRES_DB
+          value: "pulse"
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: init-db
+          mountPath: /docker-entrypoint-initdb.d/01-init.sql
+          subPath: 01-init.sql
+      volumes:
+      - name: init-db
+        configMap:
+          name: pulse-init-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector: { app: postgres }
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels: { app: redis }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: redis }
+  template:
+    metadata:
+      labels: { app: redis }
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector: { app: redis }
+  ports:
+    - port: 6379
+      targetPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels: { app: user-service }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: user-service }
+  template:
+    metadata:
+      labels: { app: user-service }
+    spec:
+      containers:
+      - name: user-service
+        image: ghcr.io/kamal-v8/vibe-microservices/user-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PORT
+          value: "8081"
+        - name: DATABASE_URL
+          value: "postgres://pulse:pulse_secret@postgres:5432/pulse?sslmode=disable"
+        - name: LOG_LEVEL
+          value: "info"
+        ports:
+        - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector: { app: user-service }
+  ports:
+    - port: 8081
+      targetPort: 8081
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-service
+  labels: { app: post-service }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: post-service }
+  template:
+    metadata:
+      labels: { app: post-service }
+    spec:
+      containers:
+      - name: post-service
+        image: ghcr.io/kamal-v8/vibe-microservices/post-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PORT
+          value: "8082"
+        - name: DATABASE_URL
+          value: "postgresql://pulse:pulse_secret@postgres:5432/pulse"
+        - name: REDIS_URL
+          value: "redis://redis:6379/0"
+        - name: USER_SERVICE_URL
+          value: "http://user-service:8081"
+        - name: LOG_LEVEL
+          value: "info"
+        ports:
+        - containerPort: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-service
+spec:
+  selector: { app: post-service }
+  ports:
+    - port: 8082
+      targetPort: 8082
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels: { app: notification-service }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: notification-service }
+  template:
+    metadata:
+      labels: { app: notification-service }
+    spec:
+      containers:
+      - name: notification-service
+        image: ghcr.io/kamal-v8/vibe-microservices/notification-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PORT
+          value: "8083"
+        - name: REDIS_URL
+          value: "redis://redis:6379/0"
+        - name: LOG_LEVEL
+          value: "info"
+        ports:
+        - containerPort: 8083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  selector: { app: notification-service }
+  ports:
+    - port: 8083
+      targetPort: 8083

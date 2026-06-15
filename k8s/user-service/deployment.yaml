@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service-pod
+          image: kamalv007/social-user-service:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8081"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-secrets
+                  key: user-service-database-url
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-shared-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8081

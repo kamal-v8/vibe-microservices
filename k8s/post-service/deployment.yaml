@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-service
+  labels:
+    app: post-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-service
+  template:
+    metadata:
+      labels:
+        app: post-service
+    spec:
+      containers:
+        - name: post-service-pod
+          image: kamalv007/social-post-service:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8082"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-secrets
+                  key: post-service-database-url
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-shared-config
+                  key: REDIS_URL
+            - name: USER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-shared-config
+                  key: USER_SERVICE_URL
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-shared-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8082

@@ -39,3 +39,6 @@ docker-compose.override.yaml
 
 # .txt
 know.txt
+
+#k8s
+secrets.yaml
