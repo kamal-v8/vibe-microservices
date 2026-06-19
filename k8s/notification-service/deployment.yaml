@@ -32,5 +32,25 @@ spec:
                 configMapKeyRef:
                   name: pulse-shared-config
                   key: LOG_LEVEL
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
           ports:
             - containerPort: 8083
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8083
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8083
+            initialDelaySeconds: 5
+            periodSeconds: 5
+

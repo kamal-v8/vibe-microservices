@@ -93,7 +93,7 @@ fastify.get('/api/v1/health', async (_request, reply) => {
     });
   } catch (err) {
     logger.error('Health check — Redis ping failed', { error: err.message });
-    return reply.code(200).send({
+    return reply.code(503).send({
       status: 'degraded',
       service: 'notification-service',
       timestamp: new Date().toISOString(),

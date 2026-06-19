@@ -19,3 +19,7 @@ resources:
   - notification-service/service.yaml
   - shared/gateway.yaml
   - shared/httproute.yaml
+  - shared/gatewayclass.yaml
+  - user-service/hpa.yaml
+  - post-service/hpa.yaml
+  - notification-service/hpa.yaml

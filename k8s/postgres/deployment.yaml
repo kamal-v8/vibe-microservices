@@ -37,6 +37,17 @@ spec:
               mountPath: /docker-entrypoint-initdb.d
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "pulse"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "pulse"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
       volumes:
         - name: init-db
           configMap:

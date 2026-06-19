@@ -179,12 +179,15 @@ app.include_router(posts_router)
 
 
 @app.get("/api/v1/health", response_model=HealthResponse, tags=["health"])
-async def health_check():
+async def health_check(response: Response):
     """Health endpoint — checks DB and Redis connectivity."""
     db_ok = await asyncio.to_thread(app.state.db.ping)
     redis_ok = await app.state.event_publisher.ping()
 
     overall = "healthy" if (db_ok and redis_ok) else "degraded"
+    
+    if overall == "degraded":
+        response.status_code = 503
 
     return HealthResponse(
         status=overall,
