@@ -1,0 +1,1 @@
+{"nodes": [{"id": "notification_service_hpa_main", "label": "Notification Service HPA", "file_type": "code", "source_file": "k8s/notification-service/hpa.yaml", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

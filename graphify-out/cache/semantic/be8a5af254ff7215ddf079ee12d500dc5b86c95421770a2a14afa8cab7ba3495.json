@@ -1,0 +1,1 @@
+{"nodes": [{"id": "redis_pvc_redis_pvc", "label": "redis-pvc PersistentVolumeClaim", "file_type": "code", "source_file": "k8s/redis/pvc.yaml"}], "edges": [], "hyperedges": []}

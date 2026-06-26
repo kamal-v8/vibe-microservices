@@ -1,0 +1,1 @@
+{"nodes": [{"id": "redis_service_redis", "label": "redis Service", "file_type": "code", "source_file": "k8s/redis/service.yaml"}], "edges": [{"source": "redis_service_redis", "target": "redis_deployment_redis", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "k8s/redis/service.yaml"}], "hyperedges": []}

@@ -1,0 +1,1 @@
+{"nodes": [{"id": "shared_gateway_pulse_gateway", "label": "pulse-gateway Gateway", "file_type": "code", "source_file": "k8s/shared/gateway.yaml"}], "edges": [{"source": "shared_gateway_pulse_gateway", "target": "shared_gatewayclass_eg", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "k8s/shared/gateway.yaml"}], "hyperedges": []}

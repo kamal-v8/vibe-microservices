@@ -1,0 +1,1 @@
+{"nodes": [{"id": "shared_gatewayclass_eg", "label": "eg GatewayClass", "file_type": "code", "source_file": "k8s/shared/gatewayclass.yaml"}], "edges": [], "hyperedges": []}
