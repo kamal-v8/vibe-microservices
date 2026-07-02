@@ -18,6 +18,15 @@ spec:
       containers:
         - name: notification-service-pod
           image: kamalv007/social-notification-service:v1
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 8083
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
@@ -53,4 +62,3 @@ spec:
               port: 8083
             initialDelaySeconds: 5
             periodSeconds: 5
-

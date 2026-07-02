@@ -18,6 +18,15 @@ spec:
       containers:
         - name: user-service-pod
           image: kamalv007/social-user-service:v1
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 8081
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
@@ -53,4 +62,3 @@ spec:
               port: 8081
             initialDelaySeconds: 5
             periodSeconds: 5
-

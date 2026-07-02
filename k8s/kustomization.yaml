@@ -4,10 +4,6 @@ kind: Kustomization
 resources:
   - shared/secrets.yaml
   - shared/configmap.yaml
-  - postgres/configmap.yaml
-  - postgres/deployment.yaml
-  - postgres/service.yaml
-  - postgres/pvc.yaml
   - redis/deployment.yaml
   - redis/service.yaml
   - redis/pvc.yaml

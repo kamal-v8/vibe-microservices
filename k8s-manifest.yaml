@@ -39,25 +39,25 @@ spec:
       labels: { app: postgres }
     spec:
       containers:
-      - name: postgres
-        image: postgres:16-alpine
-        env:
-        - name: POSTGRES_USER
-          value: "pulse"
-        - name: POSTGRES_PASSWORD
-          value: "pulse_secret"
-        - name: POSTGRES_DB
-          value: "pulse"
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: init-db
-          mountPath: /docker-entrypoint-initdb.d/01-init.sql
-          subPath: 01-init.sql
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "pulse"
+            - name: POSTGRES_PASSWORD
+              value: "pulse_secret"
+            - name: POSTGRES_DB
+              value: "pulse"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: init-db
+              mountPath: /docker-entrypoint-initdb.d/01-init.sql
+              subPath: 01-init.sql
       volumes:
-      - name: init-db
-        configMap:
-          name: pulse-init-db
+        - name: init-db
+          configMap:
+            name: pulse-init-db
 ---
 apiVersion: v1
 kind: Service
@@ -84,10 +84,10 @@ spec:
       labels: { app: redis }
     spec:
       containers:
-      - name: redis
-        image: redis:7-alpine
-        ports:
-        - containerPort: 6379
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
 ---
 apiVersion: v1
 kind: Service
@@ -114,18 +114,18 @@ spec:
       labels: { app: user-service }
     spec:
       containers:
-      - name: user-service
-        image: ghcr.io/kamal-v8/vibe-microservices/user-service:latest
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: PORT
-          value: "8081"
-        - name: DATABASE_URL
-          value: "postgres://pulse:pulse_secret@postgres:5432/pulse?sslmode=disable"
-        - name: LOG_LEVEL
-          value: "info"
-        ports:
-        - containerPort: 8081
+        - name: user-service
+          image: ghcr.io/kamal-v8/vibe-microservices/user-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8081"
+            - name: DATABASE_URL
+              value: "postgres://pulse:pulse_secret@postgres:5432/pulse?sslmode=disable"
+            - name: LOG_LEVEL
+              value: "info"
+          ports:
+            - containerPort: 8081
 ---
 apiVersion: v1
 kind: Service
@@ -152,22 +152,22 @@ spec:
       labels: { app: post-service }
     spec:
       containers:
-      - name: post-service
-        image: ghcr.io/kamal-v8/vibe-microservices/post-service:latest
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: PORT
-          value: "8082"
-        - name: DATABASE_URL
-          value: "postgresql://pulse:pulse_secret@postgres:5432/pulse"
-        - name: REDIS_URL
-          value: "redis://redis:6379/0"
-        - name: USER_SERVICE_URL
-          value: "http://user-service:8081"
-        - name: LOG_LEVEL
-          value: "info"
-        ports:
-        - containerPort: 8082
+        - name: post-service
+          image: ghcr.io/kamal-v8/vibe-microservices/post-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8082"
+            - name: DATABASE_URL
+              value: "postgresql://pulse:pulse_secret@postgres:5432/pulse"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: USER_SERVICE_URL
+              value: "http://user-service:8081"
+            - name: LOG_LEVEL
+              value: "info"
+          ports:
+            - containerPort: 8082
 ---
 apiVersion: v1
 kind: Service
@@ -194,18 +194,18 @@ spec:
       labels: { app: notification-service }
     spec:
       containers:
-      - name: notification-service
-        image: ghcr.io/kamal-v8/vibe-microservices/notification-service:latest
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: PORT
-          value: "8083"
-        - name: REDIS_URL
-          value: "redis://redis:6379/0"
-        - name: LOG_LEVEL
-          value: "info"
-        ports:
-        - containerPort: 8083
+        - name: notification-service
+          image: ghcr.io/kamal-v8/vibe-microservices/notification-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8083"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: LOG_LEVEL
+              value: "info"
+          ports:
+            - containerPort: 8083
 ---
 apiVersion: v1
 kind: Service

@@ -18,6 +18,15 @@ spec:
       containers:
         - name: post-service-pod
           image: kamalv007/social-post-service:v1
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: ture
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 8082
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
@@ -63,4 +72,3 @@ spec:
               port: 8082
             initialDelaySeconds: 5
             periodSeconds: 5
-
