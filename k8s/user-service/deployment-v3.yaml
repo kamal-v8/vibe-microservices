@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: user-service-v3
   labels:
     app: user-service
 
@@ -10,16 +10,16 @@ spec:
   selector:
     matchLabels:
       app: user-service
-      version: v2
+      version: v3
   template:
     metadata:
       labels:
         app: user-service
-        version: v2
+        version: v3
     spec:
       containers:
         - name: user-service-pod
-          image: kamalv007/social-user-service:v2
+          image: kamalv007/social-user-service:v3
           securityContext:
             runAsUser: 1000
             runAsNonRoot: true

@@ -197,6 +197,7 @@ func (h *UserHandler) HealthCheck(c *gin.Context) {
 		"status":    status,
 		"service":   "user-service",
 		"timestamp": time.Now().UTC().Format(time.RFC3339),
+		"version":   "v3-canary",
 	})
 }
 

@@ -17,10 +17,11 @@ spec:
     spec:
       containers:
         - name: post-service-pod
-          image: kamalv007/social-post-service:v1
+          image: kamalv007/social-post-service:v2
           securityContext:
+            runAsUser: 1000
             runAsNonRoot: true
-            readOnlyRootFilesystem: ture
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
@@ -58,8 +59,6 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
-          ports:
-            - containerPort: 8082
           livenessProbe:
             httpGet:
               path: /api/v1/health

@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - shared/secrets.yaml
   - shared/configmap.yaml
+  - postgres.yaml
   - redis/deployment.yaml
   - redis/service.yaml
   - redis/pvc.yaml
@@ -19,3 +20,5 @@ resources:
   - user-service/hpa.yaml
   - post-service/hpa.yaml
   - notification-service/hpa.yaml
+  - policies/redis-policy.yaml
+  - policies/api-policy.yaml

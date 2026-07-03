@@ -17,8 +17,9 @@ spec:
     spec:
       containers:
         - name: notification-service-pod
-          image: kamalv007/social-notification-service:v1
+          image: kamalv007/social-notification-service:v2
           securityContext:
+            runAsUser: 1000
             runAsNonRoot: true
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
@@ -48,8 +49,6 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
-          ports:
-            - containerPort: 8083
           livenessProbe:
             httpGet:
               path: /api/v1/health
