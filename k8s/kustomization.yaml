@@ -10,6 +10,8 @@ resources:
   - redis/pvc.yaml
   - user-service/deployment.yaml
   - user-service/service.yaml
+  - user-service/deployment-v3.yaml
+  - user-service/istio-canary.yaml
   - post-service/deployment.yaml
   - post-service/service.yaml
   - notification-service/deployment.yaml
